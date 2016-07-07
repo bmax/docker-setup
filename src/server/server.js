@@ -4,7 +4,7 @@ import serveWebpackClient from 'serve-webpack-client';
 import webpackDevMiddleware from 'webpack-dev-middleware';
 import webpack from 'webpack';
 
-const app = express(); 
+const app = express();
 const webpackConfig = require('../../webpack.config');
 const compiler = webpack(webpackConfig);
 

@@ -3,19 +3,25 @@
 import THREE from 'three';
 import Stats from 'stats.js';
 import path  from 'path';
-import World from './world';
+import { World } from './world';
+import { World as ServerWorld } from 'server/world';
 import Keyboard from './keyboard';
+import * as UI from './ui/ui';
 import * as Loader from './loader';
 import * as Entities from './entities';
 import * as Camera   from './systems/camera';
 import * as Render   from './systems/render';
-import * as Input    from './systems/input';
-import * as Physics  from './systems/physics';
-import * as Movement from 'shared/systems/movement'
+import Input    from './systems/input';
+import Physics  from './systems/physics';
+import Collision from './systems/collision';
+import Movement from 'shared/systems/movement'
+import Jump     from 'shared/systems/jump';
+import Gravity  from 'shared/systems/gravity';
 
 export default class Client {
   constructor() {
     this.stats     = this.setupStats();
+    this.ui        = this.setupUI();
     this.keyboard  = this.setupKeyboard();
     this.textures  = this.setupTextures();
     this.scene     = this.setupScene();
@@ -24,7 +30,7 @@ export default class Client {
     this.renderer  = this.setupRenderer();
     this.container = this.setupContainer();
     this.entities  = this.setupEntities();
-    this.player    = this.setupPlayer();
+    this.player    = this.setupPlayers();
 
     this.update = this.update.bind(this);
     this.render = this.render.bind(this);
@@ -32,10 +38,49 @@ export default class Client {
     this.lastLog = Math.floor(Date.now() / 1000);
   }
 
+  setupUI() {
+    this.messages = [
+      {time: '10:02:11', sender: 'Djinn21', message: 'Let go adventuring sometime', style: {color: 'red'}},
+      {time: '10:03:32', sender: 'Porlas', message: 'Yo anyone wanna come chill later', style: {color: 'blue'}}
+    ];
+
+    let ui = {
+      chat: {
+        messages: this.messages,
+        sendMessage: this.sendMessage
+      },
+      power: {
+        level: 100
+      },
+      inventory: {
+        items: [{
+          name: "thing"
+        }]
+      },
+      menu: {
+        show: false
+      },
+      dev: {
+        show: true,
+        render: this.stats.render.dom,
+        game: this.stats.game.dom
+      }
+    };
+    return ui;
+  }
+
+  sendMessage(message) {
+    this.messages.push({time: '11:11:11', sender: "kale", message: message, style: {color: 'green'}});
+  }
+
   setupStats() {
-    let stats = new Stats();
-    stats.showPanel(0);
-    document.body.appendChild(stats.dom);
+    let stats = {};
+    stats.game = new Stats();
+    stats.render = new Stats();
+    stats.game.dom.style.cssText = 'z-index:10000;margin-left:20px';
+    stats.render.dom.style.cssText = 'z-index:10000;margin-left:20px';
+    stats.game.showPanel(0);
+    stats.render.showPanel(0);
     return stats;
   }
 
@@ -46,7 +91,14 @@ export default class Client {
   }
 
   setupWorld() {
-    let world = new World(this.textures.block);
+    // Get the world from server eventually
+    let world = {
+      width: 10,
+      height: 50,
+      depth: 10
+    };
+    world.blocks = ServerWorld.generate(world);
+    world.mesh = World.createMesh(world, this.textures.block);
     this.scene.add(world.mesh);
     return world;
   }
@@ -81,7 +133,7 @@ export default class Client {
   }
 
   setupContainer() {
-    let container = document.getElementById('client');
+    let container = document.getElementById('three');
     container.innerHTML = "";
     container.appendChild(this.renderer.domElement);
 
@@ -92,7 +144,7 @@ export default class Client {
     return [];
   }
 
-  setupPlayer() {
+  setupPlayers() {
     let player = Entities.localPlayer();
     this.addEntity(player);
     this.scene.add(player.mesh.mesh);
@@ -110,23 +162,29 @@ export default class Client {
 
   update() {
     setTimeout(this.update, 20);
+    this.stats.game.begin();
     this.updateInput();
     this.updateWorld();
     this.updateMovement();
     this.updatePhysics();
-    const player = this.entities.find(e => e.id === this.player);
-    console.log(player.mesh.mesh.position, player.body.position);
+    this.updateCollision();
+    //this.updateGravity();
+    this.updateJump();
+    this.stats.game.end();
     this.log();
   }
 
   updateInput() {
-    this.entities = Input.update(this.keyboard, this.entities);
+    this.entities = Input.update(this.entities, this.keyboard);
   }
 
   updateWorld() {
     // map update may eventually take input components to check for
     // actions that would change the map.
     //this.world = this.world.update();
+
+    // collision debugging
+    this.world.mesh.material.color.set( 0x0000ff );
   }
 
   updateMovement() {
@@ -134,17 +192,29 @@ export default class Client {
   }
 
   updatePhysics() {
-    //eventually return a new world as well
-    this.entities = Physics.update(this.world, this.entities);
+    this.entities = Physics.update(this.entities);
+  }
+
+  updateCollision() {
+    this.entities = Collision.update(this.entities, this.world);
+  }
+
+  updateGravity() {
+    this.entities = Gravity.update(this.entities);
+  }
+
+  updateJump() {
+    this.entities = Jump.update(this.entities);
   }
 
   render() {
     requestAnimationFrame(this.render);
-    this.stats.begin();
+    this.stats.render.begin();
     this.updateCamera();
     this.updateScene();
+    UI.render(this.ui);
     Render.render(this.renderer, this.scene, this.camera);
-    this.stats.end();
+    this.stats.render.end();
   }
 
   updateCamera() {

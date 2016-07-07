@@ -11,6 +11,8 @@ export default class Keyboard {
   }
 
   onDown(event) {
+    event.stopPropagation();
+    event.preventDefault();
     this.keys[event.key] = true;
   }
 

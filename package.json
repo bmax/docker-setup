@@ -2,7 +2,6 @@
   "name": "vesta",
   "version": "1.0.0",
   "description": "A scalable multiplayer game with voxels.",
-  "main": "index.js",
   "scripts": {
     "start": "node dist/server/server.js & static assets",
     "build": "rm -rf dist && npm run build:client && npm run build:server",
@@ -17,16 +16,24 @@
   "license": "MIT",
   "dependencies": {
     "express": "^4.13.4",
+    "immutable": "^3.8.1",
+    "ndarray": "^1.0.18",
+    "ndarray-pack": "^1.2.0",
     "path": "^0.12.7",
+    "react": "^15.1.0",
+    "react-dom": "^15.1.0",
     "serve-webpack-client": "0.0.4",
+    "stats.js": "^0.16.0",
     "three": "^0.77.1",
     "webpack-dev-middleware": "^1.6.1"
   },
   "devDependencies": {
-    "babel-cli": "^6.9.0",
+    "babel-cli": "^6.10.1",
     "babel-core": "^6.9.1",
     "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.9.0",
+    "babel-preset-react": "^6.5.0",
+    "babel-preset-stage-2": "^6.5.0",
     "css-loader": "^0.23.1",
     "file-loader": "^0.8.5",
     "html-webpack-plugin": "^2.19.0",

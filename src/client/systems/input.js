@@ -1,10 +1,15 @@
-export const update = (keyboard, entities) => {
-  entities.forEach((entity) => {
-    if(entity.input === undefined) return;
+import Entity from 'shared/entity';
 
-    entity.input.inputs.forEach((i) => {
-      i.active = keyboard.isDown(i.key);
+const Input = {
+  update(entities, keyboard) {
+    entities.forEach(entity => {
+      if(!Entity.hasComponents(entity, ['input'])) { return; }
+      entity.input.inputs.forEach(i => {
+        i.active = keyboard.isDown(i.key);
+      });
     });
-  });
-  return entities;
+    return entities;
+  }
 }
+
+export default Input;

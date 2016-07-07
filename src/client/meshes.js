@@ -1,4 +1,7 @@
 import THREE from 'three';
+import { World } from 'shared/world';
+
+const blockSize = 100;
 
 export const player = (id, position) => {
   let geometry = new THREE.CubeGeometry( 100, 100, 100 );
@@ -12,31 +15,31 @@ export const player = (id, position) => {
   return mesh;
 }
 
-export const world = (world, texture)  => {
-  let pxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+export const blocks = (world, texture)  => {
+  let pxGeometry = new THREE.PlaneBufferGeometry( blockSize, blockSize );
   pxGeometry.attributes.uv.array[ 1 ] = 0.5;
   pxGeometry.attributes.uv.array[ 3 ] = 0.5;
   pxGeometry.rotateY( Math.PI / 2 );
   pxGeometry.translate( 50, 0, 0 );
 
-  let nxGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+  let nxGeometry = new THREE.PlaneBufferGeometry( blockSize, blockSize );
   nxGeometry.attributes.uv.array[ 1 ] = 0.5;
   nxGeometry.attributes.uv.array[ 3 ] = 0.5;
   nxGeometry.rotateY( - Math.PI / 2 );
   nxGeometry.translate( - 50, 0, 0 );
 
-  let pyGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+  let pyGeometry = new THREE.PlaneBufferGeometry( blockSize, blockSize );
   pyGeometry.attributes.uv.array[ 5 ] = 0.5;
   pyGeometry.attributes.uv.array[ 7 ] = 0.5;
   pyGeometry.rotateX( - Math.PI / 2 );
   pyGeometry.translate( 0, 50, 0 );
 
-  let pzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+  let pzGeometry = new THREE.PlaneBufferGeometry( blockSize, blockSize );
   pzGeometry.attributes.uv.array[ 1 ] = 0.5;
   pzGeometry.attributes.uv.array[ 3 ] = 0.5;
   pzGeometry.translate( 0, 0, 50 );
 
-  let nzGeometry = new THREE.PlaneBufferGeometry( 100, 100 );
+  let nzGeometry = new THREE.PlaneBufferGeometry( blockSize, blockSize );
   nzGeometry.attributes.uv.array[ 1 ] = 0.5;
   nzGeometry.attributes.uv.array[ 3 ] = 0.5;
   nzGeometry.rotateY( Math.PI );
@@ -56,24 +59,24 @@ export const world = (world, texture)  => {
   for (let x = 0; x < world.width; x++) {
     for (let y = 0; y < world.height; y++) {
       for(let z = 0; z < world.depth; z++) {
-        if(world.get(x,y,z) === 0) continue;
+        if(World.get(world, {x,y,z}) === 0) continue;
   			matrix.makeTranslation(
-  				x * 100,
-  				y * 100,
-  				z * 100
+  				x * blockSize,
+  				y * blockSize,
+  				z * blockSize
   			);
 
-        if(!world.get(x+1, y, z))
+        if(!World.get(world, {x: x+1, y, z}))
           tmpGeometry.merge(pxTmpGeometry, matrix);
-        if(!world.get(x-1, y, z))
+        if(!World.get(world, {x: x-1, y, z}))
           tmpGeometry.merge(nxTmpGeometry, matrix);
-        if(!world.get(x, y+1, z))
+        if(!World.get(world, {x, y: y+1, z}))
           tmpGeometry.merge(pyTmpGeometry, matrix);
-        if(!world.get(x,y-1,z)) {}
+        if(!World.get(world, {x, y: y-1, z}))
           //
-        if(!world.get(x,y,z+1))
+        if(!World.get(world, {x, y, z: z+1}))
           tmpGeometry.merge(pzTmpGeometry, matrix);
-        if(!world.get(x,y,z-1))
+        if(!World.get(world, {x, y, z: z-1}))
           tmpGeometry.merge(nzTmpGeometry, matrix);
       }
     }
@@ -83,7 +86,7 @@ export const world = (world, texture)  => {
   geometry.computeBoundingSphere();
   let material = new THREE.MeshLambertMaterial({ map: texture });
   let mesh = new THREE.Mesh(geometry, material);
-  mesh.name = 'world';
+  mesh.name = 'blocks';
 
   return mesh;
 }
