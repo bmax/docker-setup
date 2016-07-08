@@ -93,12 +93,17 @@ export default class Client {
   setupWorld() {
     // Get the world from server eventually
     let world = {
-      width: 10,
-      height: 50,
-      depth: 10
+      width: 50,
+      height: 10,
+      depth: 50
     };
     world.blocks = ServerWorld.generate(world);
     world.mesh = World.createMesh(world, this.textures.block);
+
+    // wireframe
+    let helper = new THREE.EdgesHelper(world.mesh, 0xffffff); // or THREE.WireframeHelper
+    helper.material.linewidth = 2;
+    this.scene.add(helper);
     this.scene.add(world.mesh);
     return world;
   }
@@ -168,7 +173,7 @@ export default class Client {
     this.updateMovement();
     this.updatePhysics();
     this.updateCollision();
-    //this.updateGravity();
+    this.updateGravity();
     this.updateJump();
     this.stats.game.end();
     this.log();

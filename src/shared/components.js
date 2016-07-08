@@ -18,6 +18,6 @@ export const collision = (
 
 export const gravity = () => ({})
 
-export const jump = (jumping=false) => ({jumping})
+export const jump = (jumping=false, start=0) => ({jumping, start})
 
 export const block = (type=0) => ({ type })

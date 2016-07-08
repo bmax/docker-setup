@@ -5,6 +5,7 @@ const blockSize = 100;
 
 export const player = (id, position) => {
   let geometry = new THREE.CubeGeometry( 100, 100, 100 );
+  geometry.computeBoundingSphere();
   let material = new THREE.MeshNormalMaterial();
   let mesh = new THREE.Mesh(geometry, material);
   mesh.name = id;
@@ -84,7 +85,13 @@ export const blocks = (world, texture)  => {
 
   let geometry = new THREE.BufferGeometry().fromGeometry(tmpGeometry);
   geometry.computeBoundingSphere();
-  let material = new THREE.MeshLambertMaterial({ map: texture });
+  //let material = new THREE.MeshLambertMaterial({ map: texture });
+  var material = new THREE.MeshPhongMaterial( {
+    color: 0xff0000,
+    polygonOffset: true,
+    polygonOffsetFactor: 1, // positive value pushes polygon further away
+    polygonOffsetUnits: 1
+} );
   let mesh = new THREE.Mesh(geometry, material);
   mesh.name = 'blocks';
 
