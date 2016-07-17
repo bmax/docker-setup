@@ -1,6 +1,10 @@
-# docket-setup
-First time trying to setup docker w/ nginx
+# vesta 
+---------
+a scalable multiplayer game set in a voxel world.
 
-to install run `docker-compose build` and then `docker-compose up`
-
-to access nginx go to http://localhost:8080
+### setup 
+```
+  npm install
+  npm run build
+  npm start
+```
