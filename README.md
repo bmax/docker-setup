@@ -4,7 +4,7 @@ a scalable multiplayer game set in a voxel world.
 
 ### setup 
 ```
-  npm install
-  npm run build
-  npm start
+  docker-compose build
+  docker-compose up
+  access at http://localhost
 ```

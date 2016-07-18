@@ -1,9 +1,0 @@
-web:
-  build: .
-  volumes:
-      - "../app:/var/www/html"
-  ports:
-    - "8080:80"
-  environment:
-    - NGINX_HOST=test.com
-    - NGINX_PORT=80
