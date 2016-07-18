@@ -33,11 +33,12 @@ module.exports = {
       { test: /\.js?$/, loader: 'source-map' }
     ],
     loaders: [
-      { test: /\.js?$/, loader: 'babel?cacheDirectory',
+      { test: /\.js?$/, loader: 'babel',
+        query: { cacheDirectory: '/tmp/' },
         exclude: /(node_modules)/
       },
       { test: /\.css$/, loader: "style-loader!css-loader"},
-      { test: /\.json$/, loader: 'json' },
+      { test: /\.json$/, loader: 'json', query: { cacheDirectory: '/tmp/' } },
       { test: /\.(png|jpg)$/, loader: 'url?limit=25000'}
     ]
   }

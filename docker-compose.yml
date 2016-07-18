@@ -1,26 +1,15 @@
-web:
-  build: ./app
-  volumes:
-    - "./app:/src/app"
-  ports:
-    - "3030:3000"
-  links:
-    - "db:rethinkdb"
-
 nginx:
   restart: always
-  build: ./nginx/
+  build: ./nginx
   ports:
     - "80:80"
-  volumes:
-    - /www/public
+  links:
+    - web
   volumes_from:
     - web
-  links:
-    - web:web
-
-db:
-  image: rethinkdb
-
-redis:
-  image: redis
+web:
+  build: .
+  volumes:
+    - "./:/src"
+  ports: 
+    - "8080:3000"
